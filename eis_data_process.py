@@ -22,16 +22,16 @@ cell_list = ['C01', 'C02', 'C03', 'C04', 'C05', 'C06', 'C07', 'C08']
 
 new_cols = ['time', 'cycle', 'f', 're', '-im', 'z', 'ph_z']
 
-total_files = len(os.listdir('EIS_data_processed'))
+total_files = len(os.listdir('EIS_data'))
 files_done = 0
 
 if len(os.listdir('EIS_data_processed')) == 0:
     for filename in os.listdir('EIS_data'):
 
+        print(f'{files_done} of {total_files} done!. file: {filename}', end='\r')
+    
         if filename == '.DS_Store':
             continue
-
-#        print(filename)
 
         if '25C' in filename:
             df = pd.read_csv('EIS_data/'+filename, delimiter='\t')
@@ -44,11 +44,13 @@ if len(os.listdir('EIS_data_processed')) == 0:
             if temp in filename:
                 maxcap_df = pd.read_csv('Max_Capacity_Data/maxcap_data_{}.csv'.format(temp))
                 room_temp = temp
+
         maxcap_col = maxcap_df.columns.get_loc('max_capacity')
 
         new_df_col = list(df[df.cycle == 1].f)
         new_df_col.extend(['cycle', 'state', 'temperature', 'max_capacity'])
         fin_df = pd.DataFrame(columns=new_df_col)
+        expected_cols = len(new_df_col)
 
         grouped = df.groupby('cycle')
         max_cycles = int(df.cycle.max())
@@ -69,9 +71,11 @@ if len(os.listdir('EIS_data_processed')) == 0:
                     temp_df = maxcap_df[(maxcap_df.cycle == cycle) & (maxcap_df.cell == cell)]
                     if not temp_df.empty:
                         row.append(temp_df.iloc[0, maxcap_col])
-            if not temp_df.empty and df.shape[1] == 64:
+
+# 64 columns expected 60 frequencies and 4 added
+            if len(row) == 64:
                 fin_df.loc[index_to_append] = row
-        print(filename, cell_state)
+
         for temp in temp_list:
             if temp in filename:
                 if 'eis_data_processed_{}.csv'.format(temp) in os.listdir('EIS_data_processed'):
@@ -80,3 +84,20 @@ if len(os.listdir('EIS_data_processed')) == 0:
                 else:
                     fin_df.to_csv('EIS_data_processed/eis_data_processed_{}.csv'.format(temp),
                                   index=False)
+
+        files_done += 1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -16,7 +16,7 @@ state_dict = {'I': 1, 'II': 2,
               'VII': 7, 'VIII': 8,
               'X': 10, 'IX': 9}
 
-temp_list = ['25C', '35C', '45C']
+temp_dict = {'25C': 25, '35C': 35, '45C': 45}
 
 cell_list = ['C01', 'C02', 'C03', 'C04', 'C05', 'C06', 'C07', 'C08']
 
@@ -28,7 +28,7 @@ files_done = 0
 if len(os.listdir('EIS_data_processed')) == 0:
     for filename in os.listdir('EIS_data'):
 
-        print(f'{files_done} of {total_files} done!. file: {filename}', end='\r')
+        print(f'{files_done} of {total_files} files done!', end='\r')
     
         if filename == '.DS_Store':
             continue
@@ -40,10 +40,10 @@ if len(os.listdir('EIS_data_processed')) == 0:
             df = pd.read_csv('EIS_data/'+filename, delimiter='\t', header=None)
             df.columns = new_cols
 
-        for temp in temp_list:
+        for temp in temp_dict.keys():
             if temp in filename:
                 maxcap_df = pd.read_csv('Max_Capacity_Data/maxcap_data_{}.csv'.format(temp))
-                room_temp = temp
+                room_temp = temp_dict[temp]
 
         maxcap_col = maxcap_df.columns.get_loc('max_capacity')
 
@@ -76,7 +76,7 @@ if len(os.listdir('EIS_data_processed')) == 0:
             if len(row) == 64:
                 fin_df.loc[index_to_append] = row
 
-        for temp in temp_list:
+        for temp in temp_dict.keys():
             if temp in filename:
                 if 'eis_data_processed_{}.csv'.format(temp) in os.listdir('EIS_data_processed'):
                     fin_df.to_csv('EIS_data_processed/eis_data_processed_{}.csv'.format(temp),

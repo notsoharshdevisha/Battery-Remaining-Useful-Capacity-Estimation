@@ -1,1 +1,2 @@
-# Battery State Estimation Using Electroscopy Data
+# Battery Remining Useful Capacity Estimation Using Electroscopy Data
+
